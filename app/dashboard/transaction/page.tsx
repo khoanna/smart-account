@@ -4,8 +4,8 @@ import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
 import { ArrowLeft, User, Fuel, ArrowRight, Check, Copy } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { sendTransaction } from "../../services/transaction/sendTransaction";
-import { publicClient } from "@/app/utils/constant";
+import { sendTransaction } from "@/services/transaction/sendTransaction";
+import { publicClient } from "@/utils/constant";
 import { formatEther, type Hex, parseEther, isAddress } from "viem";
 import SlideToConfirm from "@/components/SlideToConfirm";
 

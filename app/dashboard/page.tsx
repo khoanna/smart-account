@@ -4,9 +4,9 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowUpRight, ArrowDownLeft, Landmark, Loader2, User, Copy, Check } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { loginWithSocial } from "../services/auth/social";
-import { publicClient } from "../utils/constant";
-import { getTransactionHistory, TransactionActivity } from "../services/history";
+import { loginWithSocial } from "@/services/auth/social";
+import { publicClient } from "../../utils/constant";
+import { getTransactionHistory, TransactionActivity } from "@/services/history";
 import { formatEther, type Hex } from "viem";
 import Link from "next/link";
 
@@ -162,9 +162,8 @@ export default function DashboardPage() {
               <div className="text-center text-xs text-white/30 py-4">No recent activity</div>
             ) : (
               history.map((tx, index) => (
-                <motion.div
+                <div
                   key={index}
-                  {...getSmoothHoverAnimation()}
                   className="flex items-center justify-between gap-3 p-4 bg-[#111]/60 rounded-2xl border border-white/5 hover:bg-[#161616] cursor-pointer"
                   onClick={() => window.open(`https://sepolia.etherscan.io/tx/${tx.hash}`, "_blank")}
                 >
@@ -185,7 +184,7 @@ export default function DashboardPage() {
                     {tx.action === "Receive" ? "+" : "-"}
                     {tx.value.toFixed(4)}
                   </span>
-                </motion.div>
+                </div>
               ))
             )}
           </motion.div>

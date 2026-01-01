@@ -3,10 +3,10 @@
 import React, { useEffect, useState } from "react";
 import { Fingerprint, Wallet, ArrowRight, Mail } from "lucide-react";
 import { motion } from "framer-motion";
-import { loginWithPasskey, registerWithPasskey } from "../services/auth/passkey";
+import { loginWithPasskey, registerWithPasskey } from "@/services/auth/passkey";
 import { useRouter } from "next/navigation";
-import { loginWithSocial } from "../services/auth/social";
-import { loginWithECDSA } from "../services/auth/ecdsa";
+import { loginWithSocial } from "@/services/auth/social";
+import { loginWithECDSA } from "@/services/auth/ecdsa";
 import { Hex } from "viem";
 
 const containerVariants = {
