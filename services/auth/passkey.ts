@@ -1,5 +1,5 @@
-import { toPasskeyValidator, toWebAuthnKey, WebAuthnMode, PasskeyValidatorContractVersion } from "@zerodev/passkey-validator";
-import { createKernelAccount } from "@zerodev/sdk";
+import { toPasskeyValidator, toWebAuthnKey, WebAuthnMode, PasskeyValidatorContractVersion } from "@botanary/passkey-validator";
+import { createKernelAccount } from "@botanary/sdk";
 import { PASSKEY_NAME, entryPoint, kernelVersion, publicClient } from "../../utils/constant";
 
 export const registerWithPasskey = async (): Promise<typeof kernelAccount> => {

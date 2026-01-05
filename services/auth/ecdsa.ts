@@ -1,8 +1,8 @@
-import { signerToEcdsaValidator } from "@zerodev/ecdsa-validator";
+import { signerToEcdsaValidator } from "@botanary/ecdsa-validator";
 import { publicClient, entryPoint, kernelVersion } from "../../utils/constant";
 import { privateKeyToAccount } from "viem/accounts";
 import { type Hex } from "viem";
-import { createKernelAccount } from "@zerodev/sdk/accounts";
+import { createKernelAccount } from "@botanary/sdk/accounts";
 
 export async function loginWithECDSA(privateKey: Hex) : Promise<typeof kernelAccount> {
   const ecdsaValidator = await signerToEcdsaValidator(publicClient, {

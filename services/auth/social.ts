@@ -1,10 +1,10 @@
-import { initiateLogin, getSocialValidator, logout, isAuthorized } from "@zerodev/social-validator";
+import { initiateLogin, getSocialValidator, isAuthorized } from "@botanary/social-validator";
 import { entryPoint, kernelVersion, publicClient } from "../../utils/constant";
-import { createKernelAccount } from "@zerodev/sdk";
+import { createKernelAccount } from "@botanary/sdk";
 import { type AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 export async function checkIsLoggedInSocial(): Promise<boolean> {
-  const isUserLoggedIn = await isAuthorized({ projectId: process.env.NEXT_PUBLIC_ZERODEV_PROJECT_ID! });
+  const isUserLoggedIn = await isAuthorized({ magicPublishKey: process.env.NEXT_PUBLIC_MAGIC_PUBLIC_KEY! });
   return isUserLoggedIn;
 }
 
@@ -15,7 +15,7 @@ export async function loginWithSocial(route: AppRouterInstance): Promise<typeof 
     await initiateLogin({
       socialProvider: "google",
       oauthCallbackUrl: `${window.location.origin}/dashboard`,
-      projectId: process.env.NEXT_PUBLIC_ZERODEV_PROJECT_ID!,
+      magicPublishKey: process.env.NEXT_PUBLIC_MAGIC_PUBLIC_KEY!,
     });
     return;
   }
@@ -23,7 +23,7 @@ export async function loginWithSocial(route: AppRouterInstance): Promise<typeof 
   const socialValidator = await getSocialValidator(publicClient, {
     entryPoint,
     kernelVersion,
-    projectId: process.env.NEXT_PUBLIC_ZERODEV_PROJECT_ID!,
+    magicPublishKey: process.env.NEXT_PUBLIC_MAGIC_PUBLIC_KEY!,
   });
 
   const kernelAccount = await createKernelAccount(publicClient, {

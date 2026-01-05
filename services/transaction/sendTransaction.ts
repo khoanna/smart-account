@@ -1,10 +1,10 @@
-import { createKernelAccount, createKernelAccountClient, CreateKernelAccountReturnType } from "@zerodev/sdk";
+import { createKernelAccount, createKernelAccountClient } from "@botanary/sdk";
 import { type Hex, http } from "viem";
 import { sepolia } from "viem/chains";
 import { checkIsLoggedInSocial } from "../auth/social";
-import { getSocialValidator, initiateLogin } from "@zerodev/social-validator";
+import { getSocialValidator, initiateLogin } from "@botanary/social-validator";
 import { PASSKEY_NAME, entryPoint, kernelVersion, publicClient } from "../../utils/constant";
-import { PasskeyValidatorContractVersion, toPasskeyValidator, toWebAuthnKey, WebAuthnMode } from "@zerodev/passkey-validator";
+import { PasskeyValidatorContractVersion, toPasskeyValidator, toWebAuthnKey, WebAuthnMode } from "@botanary/passkey-validator";
 
 const sendTransactionSocial = async (to: Hex, value: bigint) => {
   const isUserLoggedIn = await checkIsLoggedInSocial();
@@ -12,14 +12,14 @@ const sendTransactionSocial = async (to: Hex, value: bigint) => {
     await initiateLogin({
       socialProvider: "google",
       oauthCallbackUrl: `${window.location.origin}/dashboard`,
-      projectId: process.env.NEXT_PUBLIC_ZERODEV_PROJECT_ID!,
+      magicPublishKey: process.env.NEXT_PUBLIC_MAGIC_PUBLIC_KEY!,
     });
     return;
   }
   const socialValidator = await getSocialValidator(publicClient, {
     entryPoint,
     kernelVersion,
-    projectId: process.env.NEXT_PUBLIC_ZERODEV_PROJECT_ID!,
+    magicPublishKey: process.env.NEXT_PUBLIC_MAGIC_PUBLIC_KEY!,
   });
 
   const kernelAccount = await createKernelAccount(publicClient, {
