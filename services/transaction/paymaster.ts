@@ -4,9 +4,13 @@ import { createWalletClient, encodeFunctionData, http, parseAbi, parseEther, typ
 import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
 
-const adminAccount = privateKeyToAccount(process.env.ADMIN_PRIVATE_KEY! as Hex);
-
 export const acceptUser = async (address: Hex) => {
+  if (!process.env.ADMIN_PRIVATE_KEY) {
+    throw new Error("ADMIN_PRIVATE_KEY environment variable is not set");
+  }
+  
+  const adminAccount = privateKeyToAccount(process.env.ADMIN_PRIVATE_KEY as Hex);
+  
   const adminWalletClient = createWalletClient({
     account: adminAccount,
     chain: sepolia,
