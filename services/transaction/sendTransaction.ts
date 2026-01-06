@@ -3,7 +3,7 @@ import { Address, encodeFunctionData, type Hex, http, parseAbi, parseEther } fro
 import { sepolia } from "viem/chains";
 import { checkIsLoggedInSocial } from "../auth/social";
 import { getSocialValidator, initiateLogin } from "@botanary/social-validator";
-import { PASSKEY_NAME, entryPoint, ERC20_PAYMASTER_ADDRESS, kernelVersion, PER_APPROVE_AMOUNT, publicClient, SPONSOR_PAYMASTER_ADDRESS, TOKEN_ADDRESS, APP_DOMAIN } from "../../utils/constant";
+import { PASSKEY_NAME, entryPoint, kernelVersion, publicClient, SPONSOR_PAYMASTER_ADDRESS } from "../../utils/constant";
 import { PasskeyValidatorContractVersion, toPasskeyValidator, toWebAuthnKey, WebAuthnMode } from "@botanary/passkey-validator";
 import { acceptUserClient } from "./paymasterClient";
 import { signerToEcdsaValidator } from "@botanary/ecdsa-validator";
@@ -135,7 +135,7 @@ const sendTransactionPasskey = async (to: Hex, value: bigint, retryCount = 0): P
     passkeyServerUrl: process.env.NEXT_PUBLIC_PASSKEY_SERVER_URL!,
     mode: WebAuthnMode.Login,
     passkeyServerHeaders: {},
-    rpID: APP_DOMAIN,
+    ...(typeof window !== "undefined" && { rpID: window.location.hostname }),
   });
   try {
     const passkeyValidator = await toPasskeyValidator(publicClient, {
@@ -209,7 +209,7 @@ const sendTransactionPasskey = async (to: Hex, value: bigint, retryCount = 0): P
 const sendTransactionECDSA = async (to: Hex, value: bigint, password: string, retryCount = 0): Promise<Hex> => {
   const encryptedPrivateKey = localStorage.getItem("encryptedPrivateKey");
   const storedEoaAddress = localStorage.getItem("eoaAddress");
-  
+
   if (!encryptedPrivateKey || !storedEoaAddress) {
     throw new Error("EOA credentials not found");
   }
@@ -217,14 +217,14 @@ const sendTransactionECDSA = async (to: Hex, value: bigint, password: string, re
   try {
     // Decrypt private key with password
     const decryptedPrivateKey = decryptKey(encryptedPrivateKey, password);
-    
+
     if (!decryptedPrivateKey) {
       throw new Error("Invalid password");
     }
 
     // Verify the private key matches the stored EOA address
     const eoaAccount = privateKeyToAccount(decryptedPrivateKey as Hex);
-    
+
     if (eoaAccount.address.toLowerCase() !== storedEoaAddress.toLowerCase()) {
       throw new Error("Private key mismatch - invalid password");
     }
