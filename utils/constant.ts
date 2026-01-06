@@ -13,7 +13,7 @@ export const entryPoint = getEntryPoint(ENNTRYPOINT_VERSION);
 export const kernelVersion = KERNEL_V3_3;
 export const PASSKEY_NAME = "Wallet Passkey";
 export const publicClient = createPublicClient({
-  transport: http(),
+  transport: http(process.env.NEXT_PUBLIC_SEPOLIA_RPC!),
   chain: sepolia,
 });
 

@@ -8,6 +8,7 @@ import { sendTransaction } from "@/services/transaction/sendTransaction";
 import { publicClient } from "@/utils/constant";
 import { formatEther, type Hex, parseEther, isAddress } from "viem";
 import SlideToConfirm from "@/components/SlideToConfirm";
+import { formatBalance } from "@/utils/formatBalance";
 
 export default function SendPage() {
   const router = useRouter();
@@ -18,18 +19,26 @@ export default function SendPage() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [balance, setBalance] = useState<string>("0.00");
+  const [password, setPassword] = useState("");
+  const [isEOA, setIsEOA] = useState(false);
 
   useEffect(() => {
     const fetchBalance = async () => {
       const storedAccountAddress = localStorage.getItem("kernelAccountAddress");
+      const loginType = localStorage.getItem("type");
+      
+      if (loginType === "ecdsa") {
+        setIsEOA(true);
+      }
+      
       if (storedAccountAddress) {
         const kernelAccountAddress = JSON.parse(storedAccountAddress);
         const balance = await publicClient.getBalance({
           address: kernelAccountAddress,
         });
-        setBalance(Number(formatEther(balance)).toFixed(4).toString());
+        setBalance(formatBalance(BigInt(balance), 18, 4));
       } else {
-        router.push("/login");
+        router.push("/");
       }
     };
     fetchBalance();
@@ -44,8 +53,12 @@ export default function SendPage() {
     }
     const inputVal = parseFloat(val);
     const maxBalance = parseFloat(balance);
-    if (!isNaN(inputVal) && inputVal <= maxBalance) {
-      setAmount(val);
+    if (!isNaN(inputVal) && inputVal >= 0) {
+      if (inputVal > maxBalance) {
+        setAmount(balance);
+      } else {
+        setAmount(val);
+      }
     }
   };
 
@@ -60,157 +73,216 @@ export default function SendPage() {
 
   const handleConfirm = async () => {
     if (isProcessing || isSuccess) return;
+    
+    // Check password for EOA transactions
+    if (isEOA && !password) {
+      alert("Password is required for EOA transactions");
+      return;
+    }
+    
     setIsProcessing(true);
     try {
       const val = parseEther(amount);
       const toAddress = recipient as Hex;
-      const txHash = await sendTransaction(toAddress, val);
+      const txHash = await sendTransaction(toAddress, val, isEOA ? password : undefined);
       if (txHash) {
         setIsProcessing(false);
         setIsSuccess(true);
         setTimeout(() => {
           setShowConfirm(false);
+          setPassword(""); // Clear password
           router.push("/dashboard");
         }, 2000);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Transaction failed:", error);
       setIsProcessing(false);
-      alert("Transaction failed. Check console for details.");
+      
+      // Handle specific error messages
+      if (error?.message?.includes("Invalid password") || error?.message?.includes("mismatch")) {
+        alert("Invalid password. Please try again.");
+        setPassword(""); // Clear wrong password
+      } else {
+        alert("Transaction failed. Check console for details.");
+      }
     }
   };
 
   return (
     <div className="min-h-screen bg-[#050505] font-sans text-slate-200 relative overflow-hidden">
-      <div className="px-6 pt-14 pb-6 flex items-center justify-between">
-        <button onClick={() => router.back()} className="p-2 -ml-2 rounded-full hover:bg-white/10 transition-colors">
-          <ArrowLeft className="w-6 h-6 text-white" />
-        </button>
-        <h1 className="text-lg font-bold text-white">Send ETH</h1>
-        <div className="w-6" />
+      {/* Background Elements */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-purple-900/10 blur-[120px] rounded-full" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-emerald-900/10 blur-[120px] rounded-full" />
       </div>
 
-      <div className="px-6 mt-4 space-y-8">
-        <div className="flex flex-col items-center justify-center space-y-2 py-10">
-          <div className="relative flex items-center justify-center w-full">
-            <input
-              type="number"
-              value={amount}
-              onChange={handleAmountChange}
-              placeholder="0.00"
-              className="bg-transparent text-6xl font-bold text-white placeholder-white/20 text-center w-2/3 focus:outline-none focus:placeholder-transparent"
-            />
-          </div>
-
-          {/* Balance Display with Max Button */}
-          <div className="flex items-center gap-2 bg-[#1a1a1a] pl-3 pr-1.5 py-1.5 rounded-full border border-white/5 transition-colors hover:border-white/10">
-            <div className="w-4 h-4 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.4)]" />
-            <span className="text-xs font-medium text-white/60">Balance: {balance} ETH</span>
-
-            {/* MAX Button */}
-            <button
-              onClick={() => setAmount(balance.toString())}
-              className="ml-2 bg-[#2a2a2a] hover:bg-[#333] text-[10px] font-bold text-emerald-400 px-2 py-1 rounded-full border border-white/5 transition-all active:scale-95"
-            >
-              MAX
-            </button>
+      {/* Container */}
+      <div className="relative w-full max-w-4xl mx-auto px-6">
+        {/* Header */}
+        <div className="py-8 flex items-center gap-4">
+          <button 
+            onClick={() => router.back()} 
+            className="w-10 h-10 rounded-xl bg-[#0a0a0a] border border-white/10 hover:bg-[#111] flex items-center justify-center transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5 text-white" />
+          </button>
+          <div>
+            <h1 className="text-xl font-bold text-white">Send Transaction</h1>
+            <p className="text-xs text-white/40 mt-0.5">Transfer ETH to any address</p>
           </div>
         </div>
 
-        <div className="space-y-3">
-          <label className="text-xs font-bold text-white/40 uppercase tracking-wider ml-1">To Address</label>
-          <div className="relative group">
-            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-              <User className="w-5 h-5 text-white/30 group-focus-within:text-emerald-400 transition-colors" />
+        {/* Main Card */}
+        <div className="bg-gradient-to-br from-[#0a0a0a] to-[#111] rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
+          {/* Amount Section */}
+          <div className="p-8 border-b border-white/5">
+            <label className="text-xs font-bold text-white/40 uppercase tracking-wider mb-4 block">Amount</label>
+            <div className="flex flex-col items-center justify-center space-y-4 py-8">
+              <div className="relative flex items-center justify-center w-full">
+                <input
+                  type="number"
+                  min="0"
+                  max={balance}
+                  value={amount}
+                  onChange={handleAmountChange}
+                  placeholder="0.00"
+                  className="bg-transparent text-6xl md:text-7xl font-bold text-white placeholder-white/10 text-center w-full focus:outline-none"
+                />
+              </div>
+              <span className="text-2xl text-white/30 font-medium">ETH</span>
+
+              {/* Balance Display */}
+              <div className="flex items-center gap-3 bg-[#0f0f0f] px-4 py-2.5 rounded-xl border border-white/5">
+                <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
+                <span className="text-sm font-medium text-white/60">Balance: {balance} ETH</span>
+                <button
+                  onClick={() => setAmount(balance.toString())}
+                  className="ml-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-xs font-bold text-emerald-400 px-3 py-1.5 rounded-lg border border-emerald-500/20 transition-all active:scale-95"
+                >
+                  MAX
+                </button>
+              </div>
             </div>
-            <input
-              type="text"
-              value={recipient}
-              onChange={(e) => setRecipient(e.target.value)}
-              placeholder="Recipient Address"
-              className="w-full bg-[#111] border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:border-emerald-500/50 transition-all placeholder:text-white/20 font-mono"
-            />
+          </div>
+
+          {/* Recipient Section */}
+          <div className="p-8">
+            <label className="text-xs font-bold text-white/40 uppercase tracking-wider mb-4 block">Recipient Address</label>
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                <User className="w-5 h-5 text-white/30 group-focus-within:text-emerald-400 transition-colors" />
+              </div>
+              <input
+                type="text"
+                value={recipient}
+                onChange={(e) => setRecipient(e.target.value)}
+                placeholder="0x..."
+                className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white focus:outline-none focus:border-emerald-500/50 focus:bg-[#141414] transition-all placeholder:text-white/20 font-mono text-sm"
+              />
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="fixed bottom-20 left-0 right-0 p-6 bg-linear-to-t from-[#050505] to-transparent">
-        <button
-          onClick={handleReview}
-          disabled={!amount || !recipient}
-          className={`w-full py-4 rounded-2xl font-bold text-lg transition-all ${amount && recipient ? "bg-white text-black hover:scale-[1.02]" : "bg-[#1a1a1a] text-white/20 cursor-not-allowed"}`}
-        >
-          Review Transaction
-        </button>
+        {/* Action Button */}
+        <div className="mt-8 pb-8">
+          <button
+            onClick={handleReview}
+            disabled={!amount || !recipient}
+            className={`w-full py-5 rounded-2xl font-bold text-base transition-all shadow-lg ${
+              amount && recipient 
+                ? "bg-white text-black hover:bg-gray-100 shadow-white/10" 
+                : "bg-[#1a1a1a] text-white/20 cursor-not-allowed"
+            }`}
+          >
+            Continue to Review
+          </button>
+        </div>
       </div>
 
       <AnimatePresence>
         {showConfirm && (
           <>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowConfirm(false)} className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40" />
+            <motion.div 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }} 
+              exit={{ opacity: 0 }} 
+              onClick={() => !isProcessing && !isSuccess && setShowConfirm(false)} 
+              className="fixed inset-0 bg-black/80 backdrop-blur-md z-40" 
+            />
 
             <motion.div
-              initial={{ y: "100%" }}
-              animate={{ y: 0 }}
-              exit={{ y: "100%" }}
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="fixed bottom-0 left-0 right-0 bg-[#0a0a0a] rounded-t-[2.5rem] border-t border-white/10 overflow-hidden max-h-[90vh] flex flex-col z-99"
+              className="fixed inset-0 z-50 flex items-center justify-center p-6"
             >
-              <div className="w-full flex justify-center pt-3 pb-1">
-                <div className="w-12 h-1.5 bg-white/10 rounded-full" />
-              </div>
-
-              <div className="p-6 pb-10 flex flex-col items-center flex-1">
-                <div className="w-16 h-16 rounded-full bg-[#1a1a1a] border border-white/5 flex items-center justify-center mb-6 shadow-2xl relative">
-                  <div className="absolute inset-0 bg-yellow-500/10 rounded-full blur-xl" />
-                  <ArrowRight className="w-6 h-6 text-yellow-200 -rotate-45" />
+              <div className="w-full max-w-md bg-[#0a0a0a] rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
+                {/* Header */}
+                <div className="p-6 border-b border-white/5">
+                  <div className="flex items-center justify-center mb-4">
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-400 to-purple-600 flex items-center justify-center shadow-lg">
+                      <ArrowRight className="w-8 h-8 text-white -rotate-45" />
+                    </div>
+                  </div>
+                  <h2 className="text-3xl font-bold text-white text-center mb-1">{amount} ETH</h2>
+                  <p className="text-sm text-white/40 text-center">Confirm your transaction</p>
                 </div>
 
-                <h2 className="text-4xl font-bold text-[#FDE047] mb-1">{amount} USDC</h2>
-                <p className="text-white/40 text-sm font-medium mb-10">≈ ${amount} USD</p>
-
-                <div className="w-full bg-[#111] rounded-3xl p-5 space-y-6 border border-white/5 mb-8">
-                  <div className="flex items-center justify-between">
-                    <span className="text-white/40 font-medium text-sm">To</span>
-                    <div className="flex items-center gap-3 bg-[#1a1a1a] pl-2 pr-3 py-1.5 rounded-full border border-white/5">
-                      <div className="w-6 h-6 rounded-full bg-purple-600 flex items-center justify-center text-[10px] font-bold">{recipient.slice(0, 1).toUpperCase()}</div>
-                      <span className="text-sm font-medium text-white tracking-tight">{recipient.length > 10 ? `${recipient.slice(0, 6)}...${recipient.slice(-4)}` : recipient}</span>
-                      <Copy className="w-3 h-3 text-white/30" />
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <span className="text-white/40 font-medium text-sm">From</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-full bg-[#222] flex items-center justify-center border border-white/5">
-                        <Fuel className="w-3 h-3 text-blue-400" />
-                      </div>
-                      <span className="text-sm font-medium text-white">Universal Gas Account</span>
-                    </div>
-                  </div>
-
-                  <div className="h-px w-full bg-white/5" />
-
-                  <div className="flex items-center justify-between">
-                    <div className="flex flex-col items-start">
-                      <span className="text-white/60 font-medium text-sm">Network Fee</span>
-                      <span className="text-[10px] text-emerald-500/80 font-bold tracking-wider uppercase mt-0.5">Benefit</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 bg-emerald-900/20 px-3 py-1.5 rounded-full border border-emerald-500/20">
-                      <span className="text-xs font-bold text-emerald-400">Sponsored</span>
-                      <div className="bg-emerald-500 rounded-full p-0.5">
-                        <Check className="w-2 h-2 text-black" strokeWidth={4} />
+                {/* Details */}
+                <div className="p-6 space-y-4">
+                  <div className="bg-[#0f0f0f] rounded-2xl p-4 space-y-4 border border-white/5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-white/40 font-medium uppercase tracking-wider">To</span>
+                      <div className="flex items-center gap-2 bg-[#1a1a1a] px-3 py-1.5 rounded-lg border border-white/5">
+                        <div className="w-5 h-5 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-[9px] font-bold text-white">
+                          {recipient.slice(2, 3).toUpperCase()}
+                        </div>
+                        <span className="text-xs font-mono text-white">
+                          {recipient.length > 10 ? `${recipient.slice(0, 6)}...${recipient.slice(-4)}` : recipient}
+                        </span>
                       </div>
                     </div>
+
+                    <div className="h-px bg-white/5" />
+
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-white/40 font-medium uppercase tracking-wider">Network Fee</span>
+                      <div className="flex items-center gap-2 bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-500/20">
+                        <Check className="w-3 h-3 text-emerald-400" />
+                        <span className="text-xs font-bold text-emerald-400">Sponsored</span>
+                      </div>
+                    </div>
+
+                    <div className="h-px bg-white/5" />
+
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-white/40 font-medium uppercase tracking-wider">Estimated Time</span>
+                      <span className="text-xs text-white/60 font-medium">~15 seconds</span>
+                    </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-1">
-                    <span className="text-white/20 text-xs">Est. processing time</span>
-                    <span className="text-white/40 text-xs font-medium">{"<"} 15 seconds</span>
-                  </div>
+                  {/* Password Input for EOA */}
+                  {isEOA && (
+                    <div className="bg-yellow-500/5 border border-yellow-500/20 rounded-2xl p-4">
+                      <label className="text-xs font-bold text-yellow-200/80 uppercase tracking-wider mb-3 block">🔐 Enter Password</label>
+                      <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Your encryption password"
+                        className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-emerald-500/50 transition-all placeholder:text-white/20"
+                        disabled={isProcessing || isSuccess}
+                      />
+                      <p className="text-xs text-yellow-200/60 mt-2">Required for EOA wallet transactions</p>
+                    </div>
+                  )}
                 </div>
 
-                <SlideToConfirm onConfirm={handleConfirm} isSuccess={isSuccess} isProcessing={isProcessing} />
+                {/* Footer */}
+                <div className="p-6 bg-[#0f0f0f] border-t border-white/5">
+                  <SlideToConfirm onConfirm={handleConfirm} isSuccess={isSuccess} isProcessing={isProcessing} />
+                </div>
               </div>
             </motion.div>
           </>

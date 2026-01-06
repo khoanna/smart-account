@@ -65,7 +65,9 @@ export const getTransactionHistory = async (address: string): Promise<Transactio
       })
       .sort((a, b) => {
         return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
-      });
+      }).filter((tx) =>
+        tx.value > 0.0001
+      );
 
     return history;
   } catch (error) {
