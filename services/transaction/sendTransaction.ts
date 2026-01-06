@@ -137,6 +137,7 @@ const sendTransactionPasskey = async (to: Hex, value: bigint, retryCount = 0): P
     passkeyServerHeaders: {},
     ...(typeof window !== "undefined" && { rpID: window.location.hostname }),
   });
+
   try {
     const passkeyValidator = await toPasskeyValidator(publicClient, {
       webAuthnKey,
@@ -199,7 +200,29 @@ const sendTransactionPasskey = async (to: Hex, value: bigint, retryCount = 0): P
 
       await acceptUserClient(kernelAccount.address);
 
-      return sendTransactionPasskey(to, value, retryCount + 1);
+      const sponsoredClient = createKernelAccountClient({
+        account: kernelAccount,
+        chain: sepolia,
+        bundlerTransport: http(process.env.NEXT_PUBLIC_ZERODEV_BUNDLER_URL || ""),
+        paymaster: {
+          getPaymasterData: async (userOp) => {
+            return {
+              paymaster: SPONSOR_PAYMASTER_ADDRESS as Address,
+              paymasterData: "0x" as Hex,
+              paymasterVerificationGasLimit: BigInt(100000),
+              paymasterPostOpGasLimit: BigInt(0),
+            };
+          },
+        },
+      });
+
+      const txHash = await sponsoredClient.sendTransaction({
+        to: to,
+        value: value,
+        data: "0x",
+      });
+
+      return txHash;
     }
 
     throw parsedError;
