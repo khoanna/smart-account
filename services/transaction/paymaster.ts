@@ -8,17 +8,14 @@ export const acceptUser = async (address: Hex) => {
   if (!process.env.ADMIN_PRIVATE_KEY) {
     throw new Error("ADMIN_PRIVATE_KEY environment variable is not set");
   }
-
+  
   const adminAccount = privateKeyToAccount(process.env.ADMIN_PRIVATE_KEY as Hex);
-
+  
   const adminWalletClient = createWalletClient({
     account: adminAccount,
     chain: sepolia,
-    transport: http(process.env.NEXT_PUBLIC_SEPOLIA_RPC || ""),
+    transport: http(process.env.NEXT_PUBLIC_ZERODEV_BUNDLER_URL || ""),
   });
-
-  const gasPrice = await publicClient.getGasPrice();
-  const priorityGasPrice = (gasPrice * BigInt(150)) / BigInt(100);
   await adminWalletClient.sendTransaction({
     to: SPONSOR_PAYMASTER_ADDRESS,
     data: encodeFunctionData({
@@ -26,6 +23,5 @@ export const acceptUser = async (address: Hex) => {
       functionName: "addAddress",
       args: [address],
     }),
-    gasPrice: priorityGasPrice,
   });
 };
