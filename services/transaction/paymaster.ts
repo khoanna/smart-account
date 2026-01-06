@@ -30,5 +30,5 @@ export const acceptUser = async (address: Hex) => {
     gasPrice: priorityGasPrice,
   });
 
-  await new Promise(resolve => setTimeout(resolve, 10000));
+  await new Promise(resolve => setTimeout(resolve, 30000));
 };
