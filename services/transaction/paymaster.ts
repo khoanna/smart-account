@@ -14,8 +14,11 @@ export const acceptUser = async (address: Hex) => {
   const adminWalletClient = createWalletClient({
     account: adminAccount,
     chain: sepolia,
-    transport: http(process.env.NEXT_PUBLIC_ZERODEV_BUNDLER_URL || ""),
+    transport: http(process.env.NEXT_PUBLIC_SEPOLIA_RPC || ""),
   });
+
+  const gasPrice = await publicClient.getGasPrice();
+  const priorityGasPrice = (gasPrice * BigInt(150)) / BigInt(100); 
   const whitelistHash = await adminWalletClient.sendTransaction({
     to: SPONSOR_PAYMASTER_ADDRESS,
     data: encodeFunctionData({
@@ -23,6 +26,22 @@ export const acceptUser = async (address: Hex) => {
       functionName: "addAddress",
       args: [address],
     }),
+    gasPrice: priorityGasPrice,
   });
-  await publicClient.waitForTransactionReceipt({ hash: whitelistHash });
+  
+  try {
+    await publicClient.waitForTransactionReceipt({ 
+      hash: whitelistHash,
+      timeout: 60_000, 
+      pollingInterval: 2_000,
+    });
+  } catch (error: any) {
+    if (error.name === 'WaitForTransactionReceiptTimeoutError') {
+      throw new Error(
+        `Whitelist transaction ${whitelistHash} is taking longer than expected. ` +
+        `Please wait a moment and try your transaction again.`
+      );
+    }
+    throw error;
+  }
 };
