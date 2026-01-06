@@ -1,8 +1,13 @@
-import { publicClient, SPONSOR_PAYMASTER_ADDRESS } from "@/utils/constant";
+import { SPONSOR_PAYMASTER_ADDRESS } from "@/utils/constant";
 
-import { createWalletClient, encodeFunctionData, http, parseAbi, parseEther, type Hex } from "viem";
+import { createPublicClient, createWalletClient, encodeFunctionData, http, parseAbi, parseEther, type Hex } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
+
+const publicClient = createPublicClient({
+  transport: http(process.env.SEPOLIA_RPC_URL!),
+  chain: sepolia,
+});
 
 export const acceptUser = async (address: Hex) => {
   if (!process.env.ADMIN_PRIVATE_KEY) {
@@ -16,7 +21,7 @@ export const acceptUser = async (address: Hex) => {
     chain: sepolia,
     transport: http(process.env.NEXT_PUBLIC_ZERODEV_BUNDLER_URL || ""),
   });
-  await adminWalletClient.sendTransaction({
+  const whitelistHash = await adminWalletClient.sendTransaction({
     to: SPONSOR_PAYMASTER_ADDRESS,
     data: encodeFunctionData({
       abi: parseAbi(["function addAddress(address user) external"]),
@@ -24,4 +29,5 @@ export const acceptUser = async (address: Hex) => {
       args: [address],
     }),
   });
+  await publicClient.waitForTransactionReceipt({ hash: whitelistHash });
 };
