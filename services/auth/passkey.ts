@@ -8,7 +8,7 @@ export const registerWithPasskey = async (): Promise<typeof kernelAccount> => {
     passkeyServerUrl: process.env.NEXT_PUBLIC_PASSKEY_SERVER_URL!,
     mode: WebAuthnMode.Register,
     passkeyServerHeaders: {},
-    rpID: window.location.hostname,
+    ...(typeof window !== 'undefined' && { rpID: window.location.hostname }),
   });
 
   const passkeyValidator = await toPasskeyValidator(publicClient, {
@@ -42,7 +42,7 @@ export const loginWithPasskey = async (): Promise<typeof kernelAccount> => {
     passkeyServerUrl: process.env.NEXT_PUBLIC_PASSKEY_SERVER_URL!,
     mode: WebAuthnMode.Login,
     passkeyServerHeaders: {},
-    rpID: window.location.hostname,
+    ...(typeof window !== 'undefined' && { rpID: window.location.hostname }),
   });
 
   const passkeyValidator = await toPasskeyValidator(publicClient, {
