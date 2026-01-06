@@ -16,18 +16,19 @@ export const acceptUser = async (address: Hex) => {
     chain: sepolia,
     transport: http(process.env.NEXT_PUBLIC_ZERODEV_BUNDLER_URL || ""),
   });
-  const whitelistHash = await adminWalletClient.sendTransaction({
+
+  const gasPrice = await publicClient.getGasPrice();
+  const priorityGasPrice = (gasPrice * BigInt(150)) / BigInt(100);
+
+  await adminWalletClient.sendTransaction({
     to: SPONSOR_PAYMASTER_ADDRESS,
     data: encodeFunctionData({
       abi: parseAbi(["function addAddress(address user) external"]),
       functionName: "addAddress",
       args: [address],
     }),
+    gasPrice: priorityGasPrice,
   });
-  await publicClient.waitForTransactionReceipt({
-    hash: whitelistHash,
-    timeout: 60000,
-    confirmations: 1,
-    pollingInterval: 1000,
-  });
+
+  await new Promise(resolve => setTimeout(resolve, 10000));
 };
