@@ -99,8 +99,8 @@ function DashboardContent() {
     <div className="min-h-screen w-full bg-[#050505] text-slate-200 font-sans relative overflow-hidden">
       {/* Background Elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-emerald-900/10 blur-[120px] rounded-full" />
-        <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-purple-900/10 blur-[120px] rounded-full" />
+        <div className="absolute top-[-10%] right-[-10%] w-125 h-125 bg-emerald-900/10 blur-[120px] rounded-full" />
+        <div className="absolute bottom-[-10%] left-[-10%] w-125 h-125 bg-purple-900/10 blur-[120px] rounded-full" />
       </div>
 
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4, ease: "easeOut" }} className="relative flex flex-col min-h-screen">
@@ -115,7 +115,7 @@ function DashboardContent() {
           >
             <div className="flex items-center gap-4">
               <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-br from-emerald-400 to-purple-600 rounded-2xl blur-md opacity-40 group-hover:opacity-60 transition duration-500" />
+                <div className="absolute -inset-1 bg-linear-to-br from-emerald-400 to-purple-600 rounded-2xl blur-md opacity-40 group-hover:opacity-60 transition duration-500" />
                 <div className="relative w-14 h-14 rounded-2xl bg-[#0a0a0a] border border-white/10 flex items-center justify-center shadow-xl">
                   <User className="w-6 h-6 text-emerald-400" />
                 </div>
@@ -152,7 +152,7 @@ function DashboardContent() {
                 variants={containerVariants} 
                 initial="hidden" 
                 animate="visible" 
-                className="bg-gradient-to-br from-[#0a0a0a] to-[#111] rounded-3xl p-8 border border-white/10 shadow-2xl mb-8"
+                className="bg-linear-to-br from-[#0a0a0a] to-[#111] rounded-3xl p-8 border border-white/10 shadow-2xl mb-8"
               >
                 <motion.div variants={itemVariants}>
                   <p className="text-sm text-white/40 font-medium mb-2 uppercase tracking-wider">Total Balance</p>

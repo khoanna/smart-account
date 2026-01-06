@@ -112,8 +112,8 @@ export default function SendPage() {
     <div className="min-h-screen bg-[#050505] font-sans text-slate-200 relative overflow-hidden">
       {/* Background Elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-purple-900/10 blur-[120px] rounded-full" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-emerald-900/10 blur-[120px] rounded-full" />
+        <div className="absolute top-[-10%] left-[-10%] w-125 h-125 bg-purple-900/10 blur-[120px] rounded-full" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-125 h-125 bg-emerald-900/10 blur-[120px] rounded-full" />
       </div>
 
       {/* Container */}
@@ -133,7 +133,7 @@ export default function SendPage() {
         </div>
 
         {/* Main Card */}
-        <div className="bg-gradient-to-br from-[#0a0a0a] to-[#111] rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
+        <div className="bg-linear-to-br from-[#0a0a0a] to-[#111] rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
           {/* Amount Section */}
           <div className="p-8 border-b border-white/5">
             <label className="text-xs font-bold text-white/40 uppercase tracking-wider mb-4 block">Amount</label>
@@ -221,7 +221,7 @@ export default function SendPage() {
                 {/* Header */}
                 <div className="p-6 border-b border-white/5">
                   <div className="flex items-center justify-center mb-4">
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-400 to-purple-600 flex items-center justify-center shadow-lg">
+                    <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-emerald-400 to-purple-600 flex items-center justify-center shadow-lg">
                       <ArrowRight className="w-8 h-8 text-white -rotate-45" />
                     </div>
                   </div>
@@ -235,7 +235,7 @@ export default function SendPage() {
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-white/40 font-medium uppercase tracking-wider">To</span>
                       <div className="flex items-center gap-2 bg-[#1a1a1a] px-3 py-1.5 rounded-lg border border-white/5">
-                        <div className="w-5 h-5 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-[9px] font-bold text-white">
+                        <div className="w-5 h-5 rounded-full bg-linear-to-br from-purple-500 to-pink-500 flex items-center justify-center text-[9px] font-bold text-white">
                           {recipient.slice(2, 3).toUpperCase()}
                         </div>
                         <span className="text-xs font-mono text-white">
