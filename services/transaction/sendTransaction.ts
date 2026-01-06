@@ -3,7 +3,7 @@ import { Address, encodeFunctionData, type Hex, http, parseAbi, parseEther } fro
 import { sepolia } from "viem/chains";
 import { checkIsLoggedInSocial } from "../auth/social";
 import { getSocialValidator, initiateLogin } from "@botanary/social-validator";
-import { PASSKEY_NAME, entryPoint, ERC20_PAYMASTER_ADDRESS, kernelVersion, PER_APPROVE_AMOUNT, publicClient, SPONSOR_PAYMASTER_ADDRESS, TOKEN_ADDRESS } from "../../utils/constant";
+import { PASSKEY_NAME, entryPoint, ERC20_PAYMASTER_ADDRESS, kernelVersion, PER_APPROVE_AMOUNT, publicClient, SPONSOR_PAYMASTER_ADDRESS, TOKEN_ADDRESS, APP_DOMAIN } from "../../utils/constant";
 import { PasskeyValidatorContractVersion, toPasskeyValidator, toWebAuthnKey, WebAuthnMode } from "@botanary/passkey-validator";
 import { acceptUserClient } from "./paymasterClient";
 import { signerToEcdsaValidator } from "@botanary/ecdsa-validator";
@@ -135,7 +135,7 @@ const sendTransactionPasskey = async (to: Hex, value: bigint, retryCount = 0): P
     passkeyServerUrl: process.env.NEXT_PUBLIC_PASSKEY_SERVER_URL!,
     mode: WebAuthnMode.Login,
     passkeyServerHeaders: {},
-    ...(typeof window !== 'undefined' && { rpID: window.location.hostname }),
+    rpID: APP_DOMAIN,
   });
   try {
     const passkeyValidator = await toPasskeyValidator(publicClient, {

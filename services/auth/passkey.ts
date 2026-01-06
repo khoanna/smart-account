@@ -1,6 +1,6 @@
 import { toPasskeyValidator, toWebAuthnKey, WebAuthnMode, PasskeyValidatorContractVersion } from "@botanary/passkey-validator";
 import { createKernelAccount } from "@botanary/sdk";
-import { PASSKEY_NAME, entryPoint, kernelVersion, publicClient } from "../../utils/constant";
+import { APP_DOMAIN, PASSKEY_NAME, entryPoint, kernelVersion, publicClient } from "../../utils/constant";
 
 export const registerWithPasskey = async (): Promise<typeof kernelAccount> => {
   const webAuthnKey = await toWebAuthnKey({
@@ -8,7 +8,7 @@ export const registerWithPasskey = async (): Promise<typeof kernelAccount> => {
     passkeyServerUrl: process.env.NEXT_PUBLIC_PASSKEY_SERVER_URL!,
     mode: WebAuthnMode.Register,
     passkeyServerHeaders: {},
-    ...(typeof window !== 'undefined' && { rpID: window.location.hostname }),
+    rpID: APP_DOMAIN,
   });
 
   const passkeyValidator = await toPasskeyValidator(publicClient, {

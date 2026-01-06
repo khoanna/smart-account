@@ -2,6 +2,8 @@ import { KERNEL_V3_3, getEntryPoint } from "@botanary/sdk/constants";
 import { createPublicClient, http } from "viem";
 import { sepolia } from "viem/chains";
 
+export const APP_DOMAIN = "smart-contract-account-demo.vercel.app";
+
 export const SPONSOR_PAYMASTER_ADDRESS = "0xD8b5D09f00eF3Bd681e7C5F838C63054E73261E9";
 export const ERC20_PAYMASTER_ADDRESS = "0x49af013ae44c307876a6316a3e3d9e5a9e47e951";
 export const TOKEN_ADDRESS = "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238";
