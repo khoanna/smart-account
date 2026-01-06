@@ -135,6 +135,7 @@ const sendTransactionPasskey = async (to: Hex, value: bigint, retryCount = 0): P
     passkeyServerUrl: process.env.NEXT_PUBLIC_PASSKEY_SERVER_URL!,
     mode: WebAuthnMode.Login,
     passkeyServerHeaders: {},
+    rpID: window.location.hostname,
   });
   try {
     const passkeyValidator = await toPasskeyValidator(publicClient, {
