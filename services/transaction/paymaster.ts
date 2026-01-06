@@ -8,9 +8,9 @@ export const acceptUser = async (address: Hex) => {
   if (!process.env.ADMIN_PRIVATE_KEY) {
     throw new Error("ADMIN_PRIVATE_KEY environment variable is not set");
   }
-  
+
   const adminAccount = privateKeyToAccount(process.env.ADMIN_PRIVATE_KEY as Hex);
-  
+
   const adminWalletClient = createWalletClient({
     account: adminAccount,
     chain: sepolia,
@@ -18,8 +18,8 @@ export const acceptUser = async (address: Hex) => {
   });
 
   const gasPrice = await publicClient.getGasPrice();
-  const priorityGasPrice = (gasPrice * BigInt(150)) / BigInt(100); 
-  const whitelistHash = await adminWalletClient.sendTransaction({
+  const priorityGasPrice = (gasPrice * BigInt(150)) / BigInt(100);
+  await adminWalletClient.sendTransaction({
     to: SPONSOR_PAYMASTER_ADDRESS,
     data: encodeFunctionData({
       abi: parseAbi(["function addAddress(address user) external"]),
@@ -28,20 +28,4 @@ export const acceptUser = async (address: Hex) => {
     }),
     gasPrice: priorityGasPrice,
   });
-  
-  try {
-    await publicClient.waitForTransactionReceipt({ 
-      hash: whitelistHash,
-      timeout: 60_000, 
-      pollingInterval: 2_000,
-    });
-  } catch (error: any) {
-    if (error.name === 'WaitForTransactionReceiptTimeoutError') {
-      throw new Error(
-        `Whitelist transaction ${whitelistHash} is taking longer than expected. ` +
-        `Please wait a moment and try your transaction again.`
-      );
-    }
-    throw error;
-  }
 };
