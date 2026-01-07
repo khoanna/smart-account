@@ -37,12 +37,16 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handlePasskeyLogin = async () => {
+    setIsLoading(true);
     await loginWithPasskey();
+    setIsLoading(false);
     route.push("/dashboard");
   };
 
   const handleSocialLogin = async () => {
+    setIsLoading(true);
     await loginWithSocial(route);
+    setIsLoading(false);
   };
 
   const handleEOALogin = async () => {
@@ -126,23 +130,30 @@ export default function Home() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => handleSocialLogin()}
-                className="group w-full relative overflow-hidden bg-white text-black rounded-xl p-4 flex items-center justify-between transition-all hover:bg-gray-100 shadow-lg shadow-white/10"
+                disabled={isLoading}
+                className="group w-full relative overflow-hidden bg-white text-black rounded-xl p-4 flex items-center justify-between transition-all hover:bg-gray-100 shadow-lg shadow-white/10 disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 <div className="flex items-center gap-4 relative z-10">
                   <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm">
-                    <svg className="w-4 h-4" viewBox="0 0 24 24">
-                      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
-                      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
-                      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.26.81-.58z" fill="#FBBC05" />
-                      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
-                    </svg>
+                    {isLoading ? (
+                      <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+                    ) : (
+                      <svg className="w-4 h-4" viewBox="0 0 24 24">
+                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.26.81-.58z" fill="#FBBC05" />
+                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+                      </svg>
+                    )}
                   </div>
                   <div className="flex flex-col items-start">
-                    <span className="font-bold text-sm tracking-wide">Continue with Google</span>
+                    <span className="font-bold text-sm tracking-wide">
+                      {isLoading ? "Connecting..." : "Continue with Google"}
+                    </span>
                     <span className="text-xs text-black/50 font-medium">Recommended</span>
                   </div>
                 </div>
-                <ArrowRight className="w-5 h-5 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 ease-out" />
+                {!isLoading && <ArrowRight className="w-5 h-5 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 ease-out" />}
               </motion.button>
 
               <div className="flex items-center gap-4 my-2">
@@ -157,15 +168,22 @@ export default function Home() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => handlePasskeyLogin()}
-                className="group w-full bg-[#161616] hover:bg-[#202020] border border-white/5 hover:border-white/10 rounded-xl p-4 flex items-center justify-between transition-colors"
+                disabled={isLoading}
+                className="group w-full bg-[#161616] hover:bg-[#202020] border border-white/5 hover:border-white/10 rounded-xl p-4 flex items-center justify-between transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 <div className="flex items-center gap-4">
                   <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                    <Fingerprint className="w-5 h-5 text-emerald-400" />
+                    {isLoading ? (
+                      <div className="w-5 h-5 border-2 border-emerald-400/30 border-t-emerald-400 rounded-full animate-spin" />
+                    ) : (
+                      <Fingerprint className="w-5 h-5 text-emerald-400" />
+                    )}
                   </div>
-                  <span className="text-white font-medium text-sm">Passkey</span>
+                  <span className="text-white font-medium text-sm">
+                    {isLoading ? "Authenticating..." : "Passkey"}
+                  </span>
                 </div>
-                <ArrowRight className="w-5 h-5 text-white/40 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 ease-out" />
+                {!isLoading && <ArrowRight className="w-5 h-5 text-white/40 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 ease-out" />}
               </motion.button>
 
               {/* EOA Login */}
@@ -174,7 +192,8 @@ export default function Home() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setShowEOAModal(true)}
-                className="group w-full bg-[#161616] hover:bg-[#202020] border border-white/5 hover:border-white/10 rounded-xl p-4 flex items-center justify-between transition-colors"
+                disabled={isLoading}
+                className="group w-full bg-[#161616] hover:bg-[#202020] border border-white/5 hover:border-white/10 rounded-xl p-4 flex items-center justify-between transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 <div className="flex items-center gap-4">
                   <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
@@ -182,7 +201,7 @@ export default function Home() {
                   </div>
                   <span className="text-white/70 font-medium text-sm">External Wallet (EOA)</span>
                 </div>
-                <ArrowRight className="w-5 h-5 text-white/40 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 ease-out" />
+                {!isLoading && <ArrowRight className="w-5 h-5 text-white/40 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 ease-out" />}
               </motion.button>
             </motion.div>
           </div>
@@ -213,6 +232,7 @@ export default function Home() {
                     onChange={(e) => setPrivateKey(e.target.value)}
                     placeholder="0x..."
                     className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl py-3.5 px-4 text-white focus:outline-none focus:border-emerald-500/50 transition-all placeholder:text-white/20 font-mono text-sm focus:bg-[#202020]"
+                    disabled={isLoading}
                   />
                 </div>
               </div>
@@ -226,6 +246,7 @@ export default function Home() {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Set a password for session"
                     className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl py-3.5 px-4 text-white focus:outline-none focus:border-emerald-500/50 transition-all placeholder:text-white/20 focus:bg-[#202020]"
+                    disabled={isLoading}
                   />
                 </div>
               </div>
@@ -264,6 +285,59 @@ export default function Home() {
             </div>
           </motion.div>
         </div>
+      )}
+
+      {/* Global Loading Overlay */}
+      {isLoading && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center"
+        >
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-[#0f0f0f] rounded-3xl p-8 border border-white/10 shadow-2xl relative overflow-hidden"
+          >
+            {/* Animated Glow */}
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-purple-500/5 to-transparent pointer-events-none animate-pulse" />
+            
+            <div className="relative z-10 flex flex-col items-center gap-6">
+              {/* Spinner */}
+              <div className="relative">
+                <div className="w-16 h-16 rounded-full border-4 border-white/10" />
+                <div className="absolute inset-0 w-16 h-16 rounded-full border-4 border-transparent border-t-emerald-400 border-r-purple-400 animate-spin" />
+                <div className="absolute inset-2 w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500/20 to-purple-500/20 blur-md" />
+              </div>
+
+              {/* Text */}
+              <div className="text-center">
+                <h3 className="text-white font-bold text-lg mb-1">Connecting Wallet</h3>
+                <p className="text-white/40 text-sm">Please wait while we authenticate...</p>
+              </div>
+
+              {/* Animated Dots */}
+              <div className="flex gap-2">
+                {[0, 1, 2].map((i) => (
+                  <motion.div
+                    key={i}
+                    className="w-2 h-2 rounded-full bg-emerald-400"
+                    animate={{
+                      scale: [1, 1.3, 1],
+                      opacity: [0.5, 1, 0.5],
+                    }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      delay: i * 0.2,
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
       )}
     </div>
   );
