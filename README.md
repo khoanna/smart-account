@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Smart Account Wallet
 
-## Getting Started
+This repository contains a ZeroDev-based smart contract wallet designed with innovative features to enhance user experience and security.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Account Abstraction
+- Provides seamless user interaction by abstracting the complexities of blockchain transactions.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Multiple Authentication Methods
+- **Passkeys**: Utilizes secure passkey technology for transaction approvals.
+- **Social Login**: Allows users to log in using their social media credentials, enhancing accessibility.
+- **ECDSA**: Support for Elliptic Curve Digital Signature Algorithm for secure signing and authentication.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Sponsored Transactions
+- Integrates paymasters to sponsor user transactions, minimizing gas fees and simplifying the payment model.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Transaction History Tracking
+- Comprehensive tracking of transaction history to provide users with visibility into their wallet activities.
 
-## Learn More
+## Installation
+To install and set up this repository, follow these steps:
 
-To learn more about Next.js, take a look at the following resources:
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/khoanna/smart-account.git
+   ```
+2. Navigate into the repository:
+   ```bash
+   cd smart-account
+   ```
+3. Install the required dependencies:
+   ```bash
+   npm install
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Usage
+To interact with the smart account wallet, refer to the API documentation for detailed usage instructions.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Contribution
+Contributions are welcome! Please feel free to submit pull requests or raise issues for enhancements and bug fixes.
 
-## Deploy on Vercel
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Author
+[khoanna](https://github.com/khoanna)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Date Created
+2026-01-19 03:03:12 UTC
